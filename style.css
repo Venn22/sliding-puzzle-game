@@ -58,4 +58,12 @@ canvas {
     margin-top: 20px;
 }
 
+.img_demo {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+}
+
 /* btn mode */

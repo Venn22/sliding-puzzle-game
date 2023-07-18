@@ -1,4 +1,4 @@
-let pathImg = 'img/img2.jpg'
+let pathImg = 'img/img.jpg'
 let imgSlider
 let pieces = []
 let cols
@@ -7,7 +7,7 @@ let boards = []
 let tiles = []
 let blankSpot = - 1
 let step = 0
-
+let pieceSlice = []
 function preload() {
     imgSlider = loadImage(pathImg)
 }
@@ -28,14 +28,14 @@ function setup() {
             img.copy(imgSlider, x, y, w, h, 0, 0, w, h)
             let index = i + j * cols
             boards.push(index)
-            let tile = new Tile(index, img)
+            let tile = new Tile(index, img, x, y)
             tiles.push(tile)
         }
     }
+    pieceSlice.push(tiles[tiles.length - 1])
     boards.pop()
     tiles.pop()
     boards.push(-1)
-
     shuffle(boards, true)
 }
 
@@ -45,12 +45,17 @@ function draw() {
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             let index = i + j * cols;
+            let tileIndex = boards[index];
+
             let x = i * w;
             let y = j * h;
-            let tileIndex = boards[index];
+
 
             if (tileIndex > -1) {
                 let img = tiles[tileIndex].img;
+                // console.log(
+                //     easeOutQuad(y)
+                // )  
                 image(img, x, y, w, h);
             } else {
                 // check index of emtyPiece
@@ -58,6 +63,7 @@ function draw() {
             }
         }
     }
+
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             strokeWeight(2)
@@ -71,20 +77,22 @@ function draw() {
     }
     if (isSolved()) {
         console.log("SOLVED")
+        noLoop()
     }
 }
 function isSolved() {
     for (let i = 0; i < boards.length - 1; i++) { // because add in boards - 1
         if (boards[i] !== tiles[i].index) {
             return false
-        } else {
-            return true
         }
     }
+    return true
 
 }
-
+let d = 1
 function swap(i, j, arr) {
+    d += Math.min(1 + deltaTime / 200, 1);
+    let ease = easeOutExpo(d) 
     let temp = arr[i]
 
     arr[i] = arr[j]
@@ -131,22 +139,32 @@ function windowResized() {
 function mousePressed() {
     let i = floor(mouseX / w)
     let j = floor(mouseY / h)
+
+    console.log(i, j)
     move(i, j, boards)
 
 }
 class Tile {
-    constructor(i, img) {
+    constructor(i, img, x, y) {
         this.index = i
         this.img = img
+        this.x = x
+        this.y = y
     }
 }
-
+function easeOutExpo(x) {
+    return x === 1 ? 1 : 1 - pow(2, -10 * x);
+}
 const btnEasy = document.querySelector('.easy')
 const btnNormal = document.querySelector('.normal')
 const btnHard = document.querySelector('.hard')
+const imgDemo = document.querySelector('.img_demo')
 const stepPlay = document.querySelector('.step_play')
-stepPlay.innerHTML = `Step: ${step}`
 
+stepPlay.innerHTML = `Step: ${step}`
+imgDemo.style.backgroundImage = `url(${pathImg})`
+imgDemo.style.backgroundSize = 'cover'
+imgDemo.style.backgroundPosition = 'center'
 /* Handle select mode play */
 
 btnEasy.addEventListener('click', () => handleSelectMode('easy'))
