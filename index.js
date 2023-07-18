@@ -4,8 +4,7 @@ let cols = 10
 let rows = 10
 let boards = []
 let tiles = []
-let blankSpot = - 1 
-let 
+let blankSpot = - 1   
 function preload() {
     imgSlider = loadImage('img/img.jpg')
 }
