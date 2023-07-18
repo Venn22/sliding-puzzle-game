@@ -5,8 +5,18 @@ let rows = 10;
 let boards = [];
 let tiles = [];
 let blankSpot = -1;
+let demoImg = document.querySelector('.demoImg');
+
+
 function preload() {
-  imgSlider = loadImage("img/img2.jpg");
+  imgSlider = loadImage("img/img2.jpg", () => {
+    // Get the URL of the loaded image and set it as background
+    let imgUrl = imgSlider.canvas.toDataURL();
+    demoImg.style.backgroundImage = `url(${imgUrl})`;
+    demoImg.style.backgroundSize = '400px 400px'
+    // Once the image is set as background, you can remove the canvas from the DOM
+    imgSlider.canvas.remove();
+  });
 }
 
 function setup() {
@@ -121,3 +131,4 @@ class Tile {
     this.img = img;
   }
 }
+

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Soul</title>
     <div class="refImg">
-      <img src="img/img2.jpg" alt="img2" />
+      <img class="demoImg"/>
     </div>
     <script
       sandbox="allow-scripts"
@@ -108,7 +108,15 @@
       }
 
       .refImg > img {
-        width: 20%;
+       
+      }
+
+      .demoImg{
+        display: flex;
+        flex-direction: column;
+        width: 400px;
+        height: 400px;
+        object-fit: cover;
       }
     </style>
   </head>
