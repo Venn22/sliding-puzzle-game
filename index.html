@@ -52,42 +52,30 @@
 
     let mathRand = sfc32(...cyrb128(seed))
   </script>
-  <style>
-    html {
-      font-size: 10px;
-    }
 
-    body {
-      background: #f0f0f0;
-      margin: 0;
-      padding: 0;
-      color: white;
-      position: relative;
-      font-family: Bandeins Strange Variable, sans-serif;
-      font-size: 1.6rem;
-    }
-
-    canvas {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      position: fixed;
-      display: block;
-      margin: auto;
-      overflow: auto;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-    }
-  </style>
 </head>
 
 <body>
   <script id="core" type="text/javascript" src="core.js"></script>
   <script id="traits" type="text/javascript" src="traits.js"></script>
+
+  <div class="btn_container">
+    <button class="btn_select_mode easy">
+      Easy
+    </button>
+    <button class="btn_select_mode normal">
+      Normal
+    </button>
+    <button class="btn_select_mode hard ">
+      Hard
+    </button>
+
+
+  </div>
+  <h3 class="step_play">
+  </h3>
   <script id="index" type="text/javascript" src="index.js"></script>
-  <main></main>
+
 </body>
 
 </html>
