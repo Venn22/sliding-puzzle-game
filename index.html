@@ -1,130 +1,81 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Soul</title>
-    <div class="refImg">
-      <img class="demoImg"/>
-    </div>
-    <script
-      sandbox="allow-scripts"
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"
-    ></script>
-    <script id="snippet-contract-code" type="text/javascript">
-      let seed = null;
-    </script>
 
-    <script id="snippet-random-code" type="text/javascript">
-      // DO NOT EDIT THIS SECTION
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="style.css">
+  <title>Soul</title>
 
-      if (seed == null) {
-        const alphabet = "0123456789abcdefghijklmnopqrstuvwsyz";
-        seed =
-          new URLSearchParams(window.location.search).get("seed") ||
-          Array(64)
-            .fill(0)
-            .map((_) => alphabet[(Math.random() * alphabet.length) | 0])
-            .join("") + "i0";
-      } else {
-        let pattern = "seed=";
-        for (let i = 0; i < seed.length - pattern.length; ++i) {
-          if (seed.substring(i, i + pattern.length) == pattern) {
-            seed = seed.substring(i + pattern.length);
-            break;
-          }
+  <script sandbox="allow-scripts" type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
+  <script id="snippet-contract-code" type="text/javascript">
+    let seed = null
+  </script>
+
+  <script id="snippet-random-code" type="text/javascript">
+    // DO NOT EDIT THIS SECTION
+
+    if (seed == null) {
+      const alphabet = '0123456789abcdefghijklmnopqrstuvwsyz'
+      seed =
+        new URLSearchParams(window.location.search).get('seed') ||
+        Array(64)
+          .fill(0)
+          .map(_ => alphabet[(Math.random() * alphabet.length) | 0])
+          .join('') + 'i0'
+    } else {
+      let pattern = 'seed='
+      for (let i = 0; i < seed.length - pattern.length; ++i) {
+        if (seed.substring(i, i + pattern.length) == pattern) {
+          seed = seed.substring(i + pattern.length)
+          break
         }
       }
+    }
 
-      function cyrb128($) {
-        let _ = 1779033703,
-          u = 3144134277,
-          i = 1013904242,
-          l = 2773480762;
-        for (let n = 0, r; n < $.length; n++)
-          (_ = u ^ Math.imul(_ ^ (r = $.charCodeAt(n)), 597399067)),
-            (u = i ^ Math.imul(u ^ r, 2869860233)),
-            (i = l ^ Math.imul(i ^ r, 951274213)),
-            (l = _ ^ Math.imul(l ^ r, 2716044179));
-        return (
-          (_ = Math.imul(i ^ (_ >>> 18), 597399067)),
-          (u = Math.imul(l ^ (u >>> 22), 2869860233)),
-          (i = Math.imul(_ ^ (i >>> 17), 951274213)),
-          (l = Math.imul(u ^ (l >>> 19), 2716044179)),
-          [(_ ^ u ^ i ^ l) >>> 0, (u ^ _) >>> 0, (i ^ _) >>> 0, (l ^ _) >>> 0]
-        );
+    function cyrb128($) {
+      let _ = 1779033703,
+        u = 3144134277,
+        i = 1013904242,
+        l = 2773480762
+      for (let n = 0, r; n < $.length; n++) (_ = u ^ Math.imul(_ ^ (r = $.charCodeAt(n)), 597399067)), (u = i ^ Math.imul(u ^ r, 2869860233)), (i = l ^ Math.imul(i ^ r, 951274213)), (l = _ ^ Math.imul(l ^ r, 2716044179))
+      return (_ = Math.imul(i ^ (_ >>> 18), 597399067)), (u = Math.imul(l ^ (u >>> 22), 2869860233)), (i = Math.imul(_ ^ (i >>> 17), 951274213)), (l = Math.imul(u ^ (l >>> 19), 2716044179)), [(_ ^ u ^ i ^ l) >>> 0, (u ^ _) >>> 0, (i ^ _) >>> 0, (l ^ _) >>> 0]
+    }
+
+    function sfc32($, _, u, i) {
+      return function () {
+        ; (u >>>= 0), (i >>>= 0)
+        var l = (($ >>>= 0) + (_ >>>= 0)) | 0
+        return ($ = _ ^ (_ >>> 9)), (_ = (u + (u << 3)) | 0), (u = ((u = (u << 21) | (u >>> 11)) + (l = (l + (i = (i + 1) | 0)) | 0)) | 0), (l >>> 0) / 4294967296
       }
+    }
 
-      function sfc32($, _, u, i) {
-        return function () {
-          (u >>>= 0), (i >>>= 0);
-          var l = (($ >>>= 0) + (_ >>>= 0)) | 0;
-          return (
-            ($ = _ ^ (_ >>> 9)),
-            (_ = (u + (u << 3)) | 0),
-            (u =
-              ((u = (u << 21) | (u >>> 11)) +
-                (l = (l + (i = (i + 1) | 0)) | 0)) |
-              0),
-            (l >>> 0) / 4294967296
-          );
-        };
-      }
+    let mathRand = sfc32(...cyrb128(seed))
+  </script>
 
-      let mathRand = sfc32(...cyrb128(seed));
-    </script>
-    <style>
-      html {
-        font-size: 10px;
-      }
+</head>
 
-      body {
-        background: #f0f0f0;
-        margin: 0;
-        padding: 0;
-        color: white;
-        position: relative;
-        font-family: Bandeins Strange Variable, sans-serif;
-        font-size: 1.6rem;
-      }
+<body>
+  <script id="core" type="text/javascript" src="core.js"></script>
+  <script id="traits" type="text/javascript" src="traits.js"></script>
 
-      canvas {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        position: fixed;
-        display: block;
-        margin: auto;
-        overflow: auto;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
+  <div class="btn_container">
+    <button class="btn_select_mode easy">
+      Easy
+    </button>
+    <button class="btn_select_mode normal">
+      Normal
+    </button>
+    <button class="btn_select_mode hard ">
+      Hard
+    </button>
+  </div>
+  <div class="img_demo"> 
+  </div>
+  <h3 class="step_play">
+  </h3>
+  <script id="index" type="text/javascript" src="index.js"></script>
 
-      .refImg {
-        display: flex;
-        justify-content: flex-end;
-      }
+</body>
 
-      .refImg > img {
-       
-      }
-
-      .demoImg{
-        display: flex;
-        flex-direction: column;
-        width: 400px;
-        height: 400px;
-        object-fit: cover;
-      }
-    </style>
-  </head>
-
-  <body>
-    <script id="core" type="text/javascript" src="core.js"></script>
-    <script id="traits" type="text/javascript" src="traits.js"></script>
-    <script id="index" type="text/javascript" src="index.js"></script>
-    <main></main>
-  </body>
 </html>
