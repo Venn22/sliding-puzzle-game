@@ -1,168 +1,195 @@
-let pathImg = 'img/img.jpg'
-let imgSlider
-let pieces = []
-let cols
-let rows
-let boards = []
-let tiles = []
-let step = 0
+
+let pathImg = "img/dog.jpg";
+let imgSlider;
+let pieces = [];
+let cols;
+let rows;
+let boards = [];
+let tiles = [];
+let blankSpot = -1;
+let step = 0;
+let pieceSlice = [];
 function preload() {
-  imgSlider = loadImage(pathImg)
+  imgSlider = loadImage(pathImg);
 }
 
 function setup() {
-  sizeCanvas = windowWidth / 3
+  sizeCanvas = windowWidth / 3;
   imgSlider.resize(sizeCanvas, sizeCanvas);
-  createCanvas(sizeCanvas, sizeCanvas)
-  cols = 4
-  rows = 4
-  w = sizeCanvas / cols
-  h = sizeCanvas / rows
+  createCanvas(sizeCanvas, sizeCanvas);
+  cols = 3;
+  rows = 3;
+  w = sizeCanvas / cols;
+  h = sizeCanvas / rows;
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let x = i * w;
+      let y = j * h;
+      let img = createImage(w, h);
+      img.copy(imgSlider, x, y, w, h, 0, 0, w, h);
+      let index = i + j * cols;
+      boards.push(index);
+      let tile = new Tile(index, img, x, y);
+      tiles.push(tile);
+    }
+  }
+  pieceSlice.push(tiles[tiles.length - 1]);
+  boards.pop();
+  tiles.pop();
+  boards.push(-1);
+  shuffle(boards, true);
+}
 
-  boards = Array.from({ length: cols * rows }, (_, index) => index);
-  shuffle(boards, true)
+function draw() {
+  background(255);
+  //  randomMove(boards)
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let index = i + j * cols;
+      let tileIndex = boards[index];
 
-  if (boards.length > 0) {
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        let x = i * w
-        let y = j * h
-        let img = createImage(w, h)
-        img.copy(imgSlider, x, y, w, h, 0, 0, w, h)
-        let index = i + j * rows
-        let tile = new Tile(index, img, x, y, boards[index])
-        tiles.push(tile)
+      let x = i * w;
+      let y = j * h;
+
+      if (tileIndex > -1) {
+        let img = tiles[tileIndex].img;
+        // console.log(
+        //     easeOutQuad(y)
+        // )
+        image(img, x, y, w, h);
+      } else {
+        // check index of emtyPiece
+        // console.log(index)
       }
     }
   }
-  blank = tiles[tiles.length - 1];
-  blank.isBlank = true;
-}
-function draw() {
-  background(255)
-  //  randomMove(boards)    
-  for (let i = 0; i < boards.length; i++) {
-    tiles[i].show();
-    tiles[i].move();
+
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      strokeWeight(2);
+      let x = i * w;
+      let y = j * h;
+      noFill();
+      rect(x, y, w, h);
+    }
   }
   if (isSolved()) {
-    alert('VICTORY')
-    noLoop()
+    console.log("SOLVED");
+    noLoop();
   }
 }
 function isSolved() {
-  for (let i = 0; i < tiles.length; i++) { // because add in boards - 1
-    if (tiles[i].cI !== tiles[i].index) {
-      return false
+  for (let i = 0; i < boards.length - 1; i++) {
+    // because add in boards - 1
+    if (boards[i] !== tiles[i].index) {
+      return false;
     }
   }
-  return true
+  return true;
+}
+let d = 1;
+function swap(i, j, arr) {
+  d += Math.min(1 + deltaTime / 200, 1);
+  let ease = easeOutExpo(d);
+  let temp = arr[i];
 
+  arr[i] = arr[j];
+  arr[j] = temp;
 }
 
+function randomMove(arr) {
+  let r1 = floor(random(cols));
+  let r2 = floor(random(rows));
+  move(r1, r2, arr);
+}
+
+function move(i, j, arr) {
+  let blank = findBlank();
+
+  let blankCol = blank % cols;
+  let blankRow = floor(blank / rows);
+
+  if (isNeightbor(i, j, blankCol, blankRow)) {
+    step++;
+    stepPlay.innerHTML = `Step: ${step}`;
+    swap(blank, i + j * cols, arr);
+  } else if (!isNeightbor(i, j, blankCol, blankRow)) {
+    console.log("Khong click vao o nay dc");
+  }
+}
+function isNeightbor(i, j, x, y) {
+  if (i !== x && j !== y) {
+    return false;
+  }
+  if (abs(i - x) == 1 || abs(j - y) == 1) {
+    return true;
+  }
+}
+function findBlank() {
+  for (let i = 0; i < boards.length; i++) {
+    if (boards[i] === -1) return i;
+  }
+}
 function windowResized() {
   resizeCanvas(sizeCanvas, sizeCanvas);
 }
 function mousePressed() {
+  let i = floor(mouseX / w);
+  let j = floor(mouseY / h);
 
-  for (let i = 0; i < tiles.length; i++) {
-    tiles[i].clicked(mouseX, mouseY);
-    console.log(tiles[i].cI, tiles[i].index)
-
-  }
+  console.log(i, j);
+  move(i, j, boards);
 }
 class Tile {
-  constructor(index, img, x, y, shuffle) {
-    this.cI = shuffle;
-    this.index = index;
-    this.x = this.cI % cols * w;
-    this.y = floor(this.cI / cols) % cols * h;
+  constructor(i, img, x, y) {
+    this.index = i;
     this.img = img;
-    this.moving = false;
-    this.easing = 0.3;
-    this.targetX = x;
-    this.targetY = y;
-    this.targets = [];
-    this.count = 0;
-    this.gap = 1;
+    this.x = x;
+    this.y = y;
   }
-
-  show(index) {
-    if (!this.isBlank) {
-      // text(index, this.x + 20, this.y + 20)  
-
-      image(this.img, this.x + this.gap, this.y + this.gap, w - this.gap, h - this.gap);
-
-    }
-  }
-
-  move() {
-    if (this.targets.length) {
-      this.moving = true;
-      let ct = this.targets[this.count];
-      this.targetX = ct[0];
-      this.targetY = ct[1];
-      let dx = this.targetX - this.x;
-      this.x += dx * this.easing;
-      let dy = this.targetY - this.y;
-      this.y += dy * this.easing;
-
-      if (dist(this.x, this.y, this.targetX, this.targetY) < this.gap) {
-        this.x = this.cI % cols * w;
-        this.y = floor(this.cI / cols) % cols * h;
-        this.moving = false;
-        this.count++;
-        if (this.count >= this.targets.length) {
-          this.targets = [];
-          this.count = 0;
-        }
-      }
-    }
-  }
-
-  clicked(mx, my) {
-
-    if (mx > this.x && mx < this.x + w && my > this.y && my < this.y + h) {
-      if (this.isBlank) {
-        return false;
-      } else {
-        let distanceToBlank = dist(this.x, this.y, blank.x, blank.y);
-        if (distanceToBlank < w + this.gap) {
-          // check isNear blank 
-          let pX = this.x;
-          let pY = this.y;
-          this.targets.push([blank.x, blank.y]);
-          [blank.cI, this.cI] = [this.cI, blank.cI];
-          blank.x = pX;
-          blank.y = pY;
-          // show step
-          step++
-          stepPlay.innerHTML = `Step: ${step}`
-        } else {
-          console.log('Không gần blank');
-        }
-      }
-    }
-  }
-
+}
+function easeOutExpo(x) {
+  return x === 1 ? 1 : 1 - pow(2, -10 * x);
 }
 
-const btnEasy = document.querySelector('.easy')
-const btnNormal = document.querySelector('.normal')
-const btnHard = document.querySelector('.hard')
-const imgDemo = document.querySelector('.img_demo')
-const stepPlay = document.querySelector('.step_play')
+function initializePuzzle(cols, rows) {
+  boards = [];
+  tiles = [];
+  w = sizeCanvas / cols;
+  h = sizeCanvas / rows;
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let x = i * w;
+      let y = j * h;
+      let img = createImage(w, h);
+      img.copy(imgSlider, x, y, w, h, 0, 0, w, h);
+      let index = i + j * cols;
+      boards.push(index);
+      let tile = new Tile(index, img, x, y);
+      tiles.push(tile);
+    }
+  }
+  pieceSlice = [tiles[tiles.length - 1]];
+  boards.pop();
+  tiles.pop();
+  boards.push(-1);
+  shuffle(boards, true);
+}
+const btnEasy = document.querySelector(".easy");
+const btnNormal = document.querySelector(".normal");
+const btnHard = document.querySelector(".hard");
+const imgDemo = document.querySelector(".img_demo");
+const stepPlay = document.querySelector(".step_play");
 
-stepPlay.innerHTML = `Step: ${step}`
-imgDemo.style.backgroundImage = `url(${pathImg})`
-imgDemo.style.backgroundSize = 'cover'
-imgDemo.style.backgroundPosition = 'center'
+stepPlay.innerHTML = `Step: ${step}`;
+imgDemo.style.backgroundImage = `url(${pathImg})`;
+imgDemo.style.backgroundSize = "cover";
+imgDemo.style.backgroundPosition = "center";
 /* Handle select mode play */
 
-btnEasy.addEventListener('click', () => handleSelectMode('easy'))
-btnNormal.addEventListener('click', () => handleSelectMode('normal'))
-btnHard.addEventListener('click', () => handleSelectMode('hard'))
-
+btnEasy.addEventListener("click", () => handleSelectMode("easy"));
+btnNormal.addEventListener("click", () => handleSelectMode("normal"));
+btnHard.addEventListener("click", () => handleSelectMode("hard"));
 
 function handleSelectMode(mode) {
   switch (mode) {
@@ -184,27 +211,5 @@ function handleSelectMode(mode) {
 
   initializePuzzle(cols, rows);
 }
-function initializePuzzle(cols, rows) {
-  boards = [];
-  tiles = [];
-  w = sizeCanvas / cols;
-  h = sizeCanvas / rows;
-  boards = Array.from({ length: cols * rows }, (_, index) => index);
-  shuffle(boards, true)
-  if (boards.length > 0) {
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        let x = i * w
-        let y = j * h
-        let img = createImage(w, h)
-        img.copy(imgSlider, x, y, w, h, 0, 0, w, h)
-        let index = i + j * rows
-        let tile = new Tile(index, img, x, y, boards[index])
-        tiles.push(tile)
-      }
-    }
-  }
-  blank = tiles[tiles.length - 1];
-  blank.isBlank = true;
 
-} 
+
