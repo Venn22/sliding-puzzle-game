@@ -6,6 +6,7 @@ let rows
 let boards = []
 let tiles = []
 let step = 0
+let isChangeMode = false
 function preload() {
   imgSlider = loadImage(pathImg)
 }
@@ -19,9 +20,8 @@ function setup() {
   w = sizeCanvas / cols
   h = sizeCanvas / rows
 
-  boards = Array.from({ length: cols * rows }, (_, index) => index);
-  shuffle(boards, true)
-
+  boards = Array.from({ length: cols * rows }, (_, index) => index); // fake boards
+  // shuffle(boards, true) 
   if (boards.length > 0) {
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
@@ -40,36 +40,43 @@ function setup() {
 }
 function draw() {
   background(255)
-  //  randomMove(boards)    
   for (let i = 0; i < boards.length; i++) {
     tiles[i].show();
     tiles[i].move();
   }
-  if (isSolved()) {
-    alert('VICTORY')
-    noLoop()
-  }
+  console.log(isWin)
+
 }
+let isWin
+
 function isSolved() {
+  isWin = true
+
   for (let i = 0; i < tiles.length; i++) { // because add in boards - 1
     if (tiles[i].cI !== tiles[i].index) {
-      return false
+      isWin = false
     }
   }
-  return true
 
+  return isWin
 }
 
 function windowResized() {
   resizeCanvas(sizeCanvas, sizeCanvas);
 }
 function mousePressed() {
-
-  for (let i = 0; i < tiles.length; i++) {
-    tiles[i].clicked(mouseX, mouseY);
-    console.log(tiles[i].cI, tiles[i].index)
+  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+    for (let i = 0; i < tiles.length; i++) {
+      tiles[i].clicked(mouseX, mouseY);
+    }
 
   }
+  setTimeout(() => {
+    if (isSolved()) {
+      alert('chien thang') 
+      window.location.reload()
+    }
+  }, 1000)
 }
 class Tile {
   constructor(index, img, x, y, shuffle) {
@@ -87,12 +94,15 @@ class Tile {
     this.gap = 1;
   }
 
-  show(index) {
+  show() {
     if (!this.isBlank) {
-      // text(index, this.x + 20, this.y + 20)  
-
+      // text(index, this.x + 20, this.y + 20)   
+      if (isChangeMode) {
+        step = 0
+        isChangeMode = false
+      }
+      stepPlay.innerHTML = `Step: ${step}`
       image(this.img, this.x + this.gap, this.y + this.gap, w - this.gap, h - this.gap);
-
     }
   }
 
@@ -128,16 +138,15 @@ class Tile {
       } else {
         let distanceToBlank = dist(this.x, this.y, blank.x, blank.y);
         if (distanceToBlank < w + this.gap) {
-          // check isNear blank 
+          step++
+          // check isNear blank  
           let pX = this.x;
           let pY = this.y;
           this.targets.push([blank.x, blank.y]);
           [blank.cI, this.cI] = [this.cI, blank.cI];
           blank.x = pX;
           blank.y = pY;
-          // show step
-          step++
-          stepPlay.innerHTML = `Step: ${step}`
+
         } else {
           console.log('Không gần blank');
         }
@@ -165,6 +174,7 @@ btnHard.addEventListener('click', () => handleSelectMode('hard'))
 
 
 function handleSelectMode(mode) {
+  isChangeMode = true
   switch (mode) {
     case "easy":
       cols = 3;
