@@ -7,21 +7,27 @@ let boards = []
 let tiles = []
 let step = 0
 let isChangeMode = false
+let isStart = false
+
+
 function preload() {
   imgSlider = loadImage(pathImg)
+
 }
 
 function setup() {
   sizeCanvas = windowWidth / 3
   imgSlider.resize(sizeCanvas, sizeCanvas);
-  createCanvas(sizeCanvas, sizeCanvas)
+  myCanvas = createCanvas(sizeCanvas, sizeCanvas)
+  myCanvas.parent("myCanvas");
+
   cols = 4
   rows = 4
   w = sizeCanvas / cols
   h = sizeCanvas / rows
 
   boards = Array.from({ length: cols * rows }, (_, index) => index); // fake boards
-  // shuffle(boards, true) 
+  shuffle(boards, true)
   if (boards.length > 0) {
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
@@ -39,44 +45,44 @@ function setup() {
   blank.isBlank = true;
 }
 function draw() {
-  background(255)
-  for (let i = 0; i < boards.length; i++) {
-    tiles[i].show();
-    tiles[i].move();
-  }
-  console.log(isWin)
+  if (isStart) {
+    background('#fff')
+    for (let i = 0; i < boards.length; i++) {
+      tiles[i].show();
+      tiles[i].move();
 
+    }
+  }
 }
-let isWin
 
 function isSolved() {
-  isWin = true
 
   for (let i = 0; i < tiles.length; i++) { // because add in boards - 1
     if (tiles[i].cI !== tiles[i].index) {
-      isWin = false
+      return false
     }
   }
+  return true
 
-  return isWin
 }
 
 function windowResized() {
   resizeCanvas(sizeCanvas, sizeCanvas);
 }
+
 function mousePressed() {
   if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
     for (let i = 0; i < tiles.length; i++) {
       tiles[i].clicked(mouseX, mouseY);
     }
-
   }
+
   setTimeout(() => {
     if (isSolved()) {
-      alert('chien thang') 
-      window.location.reload()
+      alert('chien thang')
+      location.reload()
     }
-  }, 1000)
+  }, 300)
 }
 class Tile {
   constructor(index, img, x, y, shuffle) {
@@ -155,66 +161,86 @@ class Tile {
   }
 
 }
-
 const btnEasy = document.querySelector('.easy')
 const btnNormal = document.querySelector('.normal')
 const btnHard = document.querySelector('.hard')
 const imgDemo = document.querySelector('.img_demo')
 const stepPlay = document.querySelector('.step_play')
+const btnPlay = document.querySelector('.play')
+const canvasContainer = document.getElementById("myCanvas");
+const modelContainer = document.querySelector('.model')
 
-stepPlay.innerHTML = `Step: ${step}`
-imgDemo.style.backgroundImage = `url(${pathImg})`
-imgDemo.style.backgroundSize = 'cover'
-imgDemo.style.backgroundPosition = 'center'
-/* Handle select mode play */
-
-btnEasy.addEventListener('click', () => handleSelectMode('easy'))
-btnNormal.addEventListener('click', () => handleSelectMode('normal'))
-btnHard.addEventListener('click', () => handleSelectMode('hard'))
-
-
-function handleSelectMode(mode) {
-  isChangeMode = true
-  switch (mode) {
-    case "easy":
-      cols = 3;
-      rows = 3;
-      break;
-    case "normal":
-      cols = 4;
-      rows = 4;
-      break;
-    case "hard":
-      cols = 5;
-      rows = 5;
-      break;
-    default:
-      console.log("default");
-  }
-
-  initializePuzzle(cols, rows);
-}
-function initializePuzzle(cols, rows) {
-  boards = [];
-  tiles = [];
-  w = sizeCanvas / cols;
-  h = sizeCanvas / rows;
-  boards = Array.from({ length: cols * rows }, (_, index) => index);
-  shuffle(boards, true)
-  if (boards.length > 0) {
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        let x = i * w
-        let y = j * h
-        let img = createImage(w, h)
-        img.copy(imgSlider, x, y, w, h, 0, 0, w, h)
-        let index = i + j * rows
-        let tile = new Tile(index, img, x, y, boards[index])
-        tiles.push(tile)
+const handleDom = {
+  handleSelectMode(mode) {
+    isChangeMode = true
+    switch (mode) {
+      case "easy":
+        cols = 3;
+        rows = 3;
+        break;
+      case "normal":
+        cols = 4;
+        rows = 4;
+        break;
+      case "hard":
+        cols = 5;
+        rows = 5;
+        break;
+      default:
+        console.log("default");
+    }
+    this.initializePuzzle(cols, rows);
+  },
+  initializePuzzle(cols, rows) {
+    boards = [];
+    tiles = [];
+    w = sizeCanvas / cols;
+    h = sizeCanvas / rows;
+    boards = Array.from({ length: cols * rows }, (_, index) => index);
+    shuffle(boards, true)
+    if (boards.length > 0) {
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          let x = i * w
+          let y = j * h
+          let img = createImage(w, h)
+          img.copy(imgSlider, x, y, w, h, 0, 0, w, h)
+          let index = i + j * rows
+          let tile = new Tile(index, img, x, y, boards[index])
+          tiles.push(tile)
+        }
       }
     }
-  }
-  blank = tiles[tiles.length - 1];
-  blank.isBlank = true;
+    blank = tiles[tiles.length - 1];
+    blank.isBlank = true;
+  },
+  handleDisplayCanvas() {
+    canvasContainer.style.display = isStart ? "block" : "none"
+    modelContainer.style.display = isStart ? 'none' : 'flex'
+    imgDemo.style.backgroundImage = `url(${pathImg})`
+    imgDemo.style.backgroundSize = 'cover'
+    imgDemo.style.backgroundPosition = 'center'
+    if (!isStart) {
+      isStart = true
+    }
+  },
+  render() {
+    if (isStart) {
+      stepPlay.innerHTML = `Step: ${step}`
+      canvasContainer.style.display = "block"
+    }
+  },
+  handleEvent() {
+    btnEasy.onclick = () => this.handleSelectMode('easy')
+    btnNormal.onclick = () => this.handleSelectMode('normal')
+    btnHard.onclick = () => this.handleSelectMode('hard')
+    btnPlay.onclick = () => this.handleDisplayCanvas()
+  },
+  start() {
+    this.render()
+    this.handleEvent()
+    this.handleDisplayCanvas()
+  },
 
-} 
+}
+handleDom.start()  

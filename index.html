@@ -8,73 +8,50 @@
 
   <script sandbox="allow-scripts" type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
-  <script id="snippet-contract-code" type="text/javascript">
-    let seed = null
-  </script>
-
-  <script id="snippet-random-code" type="text/javascript">
-    // DO NOT EDIT THIS SECTION
-
-    if (seed == null) {
-      const alphabet = '0123456789abcdefghijklmnopqrstuvwsyz'
-      seed =
-        new URLSearchParams(window.location.search).get('seed') ||
-        Array(64)
-          .fill(0)
-          .map(_ => alphabet[(Math.random() * alphabet.length) | 0])
-          .join('') + 'i0'
-    } else {
-      let pattern = 'seed='
-      for (let i = 0; i < seed.length - pattern.length; ++i) {
-        if (seed.substring(i, i + pattern.length) == pattern) {
-          seed = seed.substring(i + pattern.length)
-          break
-        }
-      }
-    }
-
-    function cyrb128($) {
-      let _ = 1779033703,
-        u = 3144134277,
-        i = 1013904242,
-        l = 2773480762
-      for (let n = 0, r; n < $.length; n++) (_ = u ^ Math.imul(_ ^ (r = $.charCodeAt(n)), 597399067)), (u = i ^ Math.imul(u ^ r, 2869860233)), (i = l ^ Math.imul(i ^ r, 951274213)), (l = _ ^ Math.imul(l ^ r, 2716044179))
-      return (_ = Math.imul(i ^ (_ >>> 18), 597399067)), (u = Math.imul(l ^ (u >>> 22), 2869860233)), (i = Math.imul(_ ^ (i >>> 17), 951274213)), (l = Math.imul(u ^ (l >>> 19), 2716044179)), [(_ ^ u ^ i ^ l) >>> 0, (u ^ _) >>> 0, (i ^ _) >>> 0, (l ^ _) >>> 0]
-    }
-
-    function sfc32($, _, u, i) {
-      return function () {
-        ; (u >>>= 0), (i >>>= 0)
-        var l = (($ >>>= 0) + (_ >>>= 0)) | 0
-        return ($ = _ ^ (_ >>> 9)), (_ = (u + (u << 3)) | 0), (u = ((u = (u << 21) | (u >>> 11)) + (l = (l + (i = (i + 1) | 0)) | 0)) | 0), (l >>> 0) / 4294967296
-      }
-    }
-
-    let mathRand = sfc32(...cyrb128(seed))
-  </script>
-
 </head>
 
 <body>
-  <script id="core" type="text/javascript" src="core.js"></script>
-  <script id="traits" type="text/javascript" src="traits.js"></script>
+  <div id="main">
 
-  <div class="btn_container">
-    <button class="btn_select_mode easy">
-      Easy
-    </button>
-    <button class="btn_select_mode normal">
-      Normal
-    </button>
-    <button class="btn_select_mode hard ">
-      Hard
-    </button>
+    <div class="img_demo">
+    </div>
+
+    <div id="container_canvas">
+      <div class="bg_canvas">
+
+      </div>
+      <div id="myCanvas">
+        <div class="btn_container">
+          <button class="btn_select_mode easy">
+            Easy
+          </button>
+          <button class="btn_select_mode normal">
+            Normal
+          </button>
+          <button class="btn_select_mode hard ">
+            Hard
+          </button>
+        </div>
+        <h3 class="step_play">
+        </h3>
+      </div>
+    </div>
+
+    <div class="model">
+      <div class="name_game">
+        Puzzle Sliding
+      </div>
+      <button class="btn_select_mode  play ">
+        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
+          <path
+            d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z" />
+        </svg>
+      </button>
+    </div>
   </div>
-  <div class="img_demo"> 
-  </div>
-  <h3 class="step_play">
-  </h3>
-  <script id="index" type="text/javascript" src="index.js"></script> 
+
+
+  <script id="index" type="text/javascript" src="index.js"></script>
 </body>
 
 </html>
