@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+
+    <style>
+        #nftContainer img{
+            width: 20%;
+        }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input
+        type="text"
+        placeholder="Address"
+        id="inputAddress"
+        value="0x7eF61cAcD0C785eAcDFe17649d1c5BcBA676a858"
+      />
+      <!-- 0x596C2A077C671A0cE4dC959c6374d18e6c43Fe70 -->
+      <!-- 0x32A348EAD7Ed30d35B96B9F87320FEF862033574 -->
+      <!-- 0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270 -->
+      <!-- 0x79d665DB3CAdD6743c03542FFF840e740b3c17D2 -->
+      <!-- 0x7eF61cAcD0C785eAcDFe17649d1c5BcBA676a858 -->
+      <button onclick="showNFTs()">Show My NFTs</button>
+    </div>
+    <div id="nfts"></div>
+    <div id="nftContainer">
+      <h1></h1>
+      <h3></h3>
+      <img src="" alt="" />
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
